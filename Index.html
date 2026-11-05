@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ma Boîte à Outils Informatique</title>
+  <style>
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #eef3fb; color: #222; line-height: 1.5; }
+    header { background: #1d4ed8; color: #fff; text-align: center; padding: 18px 12px; }
+    header p { margin: 4px 0; font-size: 14px; }
+    main { max-width: 700px; margin: 0 auto; padding: 16px; }
+    .carte { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px;
+             box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+    h3 { color: #1d4ed8; margin: 0 0 8px; }
+    nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+    nav button { flex: 1 1 45%; background: #fff; color: #1d4ed8; border: 2px solid #1d4ed8; }
+    nav button.actif { background: #1d4ed8; color: #fff; }
+    input, select, button { width: 100%; padding: 12px; margin: 6px 0; font-size: 16px;
+                            border-radius: 8px; border: 1px solid #bbb; font-family: inherit; }
+    button { background: #1d4ed8; color: #fff; border: none; cursor: pointer; }
+    footer { text-align: center; padding: 16px; font-size: 14px; color: #555; }
+    .petit { font-size: 13px; color: #555; }
+
+    /* Calculatrice */
+    #ecran { background: #0f172a; color: #fff; font-size: 28px; text-align: right; padding: 14px;
+             border-radius: 8px; min-height: 60px; overflow-x: auto; word-break: break-all; }
+    .grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .grille button { margin: 0; padding: 16px 0; font-size: 20px; background: #e2e8f0; color: #0f172a; }
+    .grille button.op { background: #1d4ed8; color: #fff; }
+    .grille button.rouge { background: #b91c1c; color: #fff; }
+
+    /* Quiz */
+    .rep { background: #f1f5f9; color: #0f172a; text-align: left; }
+    .rep.bon { background: #16a34a; color: #fff; }
+    .rep.mauvais { background: #dc2626; color: #fff; }
+
+    /* Mot de passe */
+    #mdpResultat { background: #0f172a; color: #4ade80; font-family: monospace; font-size: 20px;
+                   padding: 14px; border-radius: 8px; word-break: break-all; text-align: center; }
+    .ligne { display: flex; align-items: center; gap: 8px; }
+    .ligne input { width: auto; margin: 0; }
+    #force { font-weight: bold; margin: 8px 0; }
+
+    /* Convertisseur */
+    #convResultat { font-size: 22px; font-weight: bold; color: #1d4ed8; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧰 Ma Boîte à Outils Informatique</h1>
+  <p>Site créé par <b>KAMGA SOB KILLIAN</b></p>
+</header>
+
+<main>
+
+  <div class="carte">
+    <h3>Pourquoi ce site a été créé ?</h3>
+    <p>Ce site a été créé pour regrouper en un seul endroit quatre outils utiles au quotidien : une calculatrice, un quiz pour tester ses connaissances en informatique, un générateur de mots de passe sécurisés et un convertisseur de monnaies. C'est aussi un projet pratique pour mettre en application ce qu'on apprend en informatique (HTML, CSS et JavaScript).</p>
+  </div>
+
+  <nav id="menu">
+    <button onclick="ouvrir('calc')" class="actif">🧮 Calculatrice</button>
+    <button onclick="ouvrir('quiz')">❓ Quiz</button>
+    <button onclick="ouvrir('mdp')">🔐 Mot de passe</button>
+    <button onclick="ouvrir('conv')">💱 Convertisseur</button>
+  </nav>
+
+  <!-- ========== 1. CALCULATRICE ========== -->
+  <section id="calc" class="carte">
+    <h3>🧮 Calculatrice</h3>
+    <div id="ecran">0</div>
+    <div class="grille">
+      <button class="rouge" onclick="effacer()">C</button>
+      <button class="rouge" onclick="retour()">⌫</button>
+      <button class="op" onclick="ajouter('(')">(</button>
+      <button class="op" onclick="ajouter(')')">)</button>
+      <button onclick="ajouter('7')">7</button>
+      <button onclick="ajouter('8')">8</button>
+      <button onclick="ajouter('9')">9</button>
+      <button class="op" onclick="ajouter('/')">÷</button>
+      <button onclick="ajouter('4')">4</button>
+      <button onclick="ajouter('5')">5</button>
+      <button onclick="ajouter('6')">6</button>
+      <button class="op" onclick="ajouter('*')">×</button>
+      <button onclick="ajouter('1')">1</button>
+      <button onclick="ajouter('2')">2</button>
+      <button onclick="ajouter('3')">3</button>
+      <button class="op" onclick="ajouter('-')">−</button>
+      <button onclick="ajouter('0')">0</button>
+      <button onclick="ajouter('.')">.</button>
+      <button class="op" onclick="calculer()">=</button>
+      <button class="op" onclick="ajouter('+')">+</button>
+    </div>
+  </section>
+
+  <!-- ========== 2. QUIZ ========== -->
+  <section id="quiz" class="carte" hidden>
+    <h3>❓ Quiz Informatique</h3>
+    <p id="quizProgres" class="petit"></p>
+    <p id="quizQuestion"><b></b></p>
+    <div id="quizReponses"></div>
+    <button id="quizSuivant" onclick="questionSuivante()" hidden>Suivant ➜</button>
+    <div id="quizFin" hidden>
+      <p id="quizScore" style="font-size:22px;font-weight:bold;text-align:center"></p>
+      <p id="quizMessage" style="text-align:center"></p>
+      <button onclick="demarrerQuiz()">🔄 Rejouer</button>
+    </div>
+  </section>
+
+  <!-- ========== 3. MOT DE PASSE ========== -->
+  <section id="mdp" class="carte" hidden>
+    <h3>🔐 Générateur de mot de passe</h3>
+    <div id="mdpResultat">Clique sur « Générer »</div>
+    <p id="force"></p>
+    <label>Longueur : <b id="longueurVal">12</b></label>
+    <input type="range" id="longueur" min="6" max="32" value="12" oninput="document.getElementById('longueurVal').textContent=this.value">
+    <div class="ligne"><input type="checkbox" id="optMin" checked> <label for="optMin">Minuscules (a-z)</label></div>
+    <div class="ligne"><input type="checkbox" id="optMaj" checked> <label for="optMaj">Majuscules (A-Z)</label></div>
+    <div class="ligne"><input type="checkbox" id="optNum" checked> <label for="optNum">Chiffres (0-9)</label></div>
+    <div class="ligne"><input type="checkbox" id="optSym" checked> <label for="optSym">Symboles (!@#$...)</label></div>
+    <button onclick="genererMdp()">⚡ Générer</button>
+    <button onclick="copierMdp()" style="background:#16a34a">📋 Copier</button>
+    <p id="msgCopie" class="petit"></p>
+  </section>
+
+  <!-- ========== 4. CONVERTISSEUR ========== -->
+  <section id="conv" class="carte" hidden>
+    <h3>💱 Convertisseur FCFA ↔ Euro / Dollar</h3>
+    <input type="number" id="montant" placeholder="Montant" value="1000" oninput="convertir()">
+    <select id="de" onchange="convertir()">
+      <option value="FCFA">FCFA</option>
+      <option value="EUR">Euro (€)</option>
+      <option value="USD">Dollar ($)</option>
+    </select>
+    <button onclick="inverser()" style="background:#64748b">⇅ Inverser</button>
+    <select id="vers" onchange="convertir()">
+      <option value="EUR">Euro (€)</option>
+      <option value="FCFA">FCFA</option>
+      <option value="USD">Dollar ($)</option>
+    </select>
+    <div id="convResultat"></div>
+    <hr>
+    <p class="petit">Taux utilisés : 1 € = 655,957 FCFA (taux fixe officiel).</p>
+    <label class="petit">1 € = <b>?</b> $ (modifiable)</label>
+    <input type="number" step="0.0001" id="tauxUsd" value="1.10" oninput="convertir()">
+    <p id="tauxMsg" class="petit"></p>
+  </section>
+
+</main>
+
+<footer>© Site créé par <b>KAMGA SOB KILLIAN</b> — Ma Boîte à Outils Informatique</footer>
+
+<script>
+  /* ---------- Navigation ---------- */
+  function ouvrir(nom) {
+    ["calc", "quiz", "mdp", "conv"].forEach((id, i) => {
+      document.getElementById(id).hidden = id !== nom;
+      document.querySelectorAll("#menu button")[i].classList.toggle("actif", id === nom);
+    });
+  }
+
+  /* ---------- 1. Calculatrice ---------- */
+  let expr = "";
+  const ecran = document.getElementById("ecran");
+  function majEcran() { ecran.textContent = expr === "" ? "0" : expr.replace(/\*/g, "×").replace(/\//g, "÷"); }
+  function ajouter(c) { expr += c; majEcran(); }
+  function effacer() { expr = ""; majEcran(); }
+  function retour() { expr = expr.slice(0, -1); majEcran(); }
+  function calculer() {
+    if (!expr) return;
+    try {
+      if (!/^[0-9+\-*/.() ]+$/.test(expr)) throw new Error();
+      const r = Function('"use strict"; return (' + expr + ')')();
+      if (!isFinite(r)) throw new Error();
+      expr = String(Math.round(r * 1e10) / 1e10);
+      majEcran();
+    } catch (e) {
+      expr = "";
+      ecran.textContent = "Erreur";
+    }
+  }
+
+  /* ---------- 2. Quiz ---------- */
+  const QUESTIONS = [
+    { q: "Que signifie CPU ?", r: ["Carte mère", "Unité centrale de traitement (processeur)", "Mémoire vive", "Disque dur"], bon: 1 },
+    { q: "Que signifie RAM ?", r: ["Mémoire vive", "Mémoire morte", "Carte graphique", "Clavier"], bon: 0 },
+    { q: "Quel langage sert à structurer une page web ?", r: ["Python", "SQL", "HTML", "C"], bon: 2 },
+    { q: "Quel langage sert à mettre en forme (style) une page web ?", r: ["CSS", "Java", "PHP", "Excel"], bon: 0 },
+    { q: "Combien de bits y a-t-il dans un octet ?", r: ["4", "16", "10", "8"], bon: 3 },
+    { q: "Laquelle de ces extensions correspond à une image ?", r: [".mp3", ".exe", ".jpg", ".docx"], bon: 2 },
+    { q: "Que signifie « www » dans une adresse web ?", r: ["World Wide Web", "Web With Windows", "World Web Wire", "Wide Web World"], bon: 0 },
+    { q: "Lequel de ces éléments est un système d'exploitation ?", r: ["Excel", "Chrome", "Word", "Linux"], bon: 3 },
+    { q: "À quoi sert un pare-feu (firewall) ?", r: ["Refroidir l'ordinateur", "Protéger le réseau contre les accès non autorisés", "Augmenter la vitesse d'Internet", "Stocker des fichiers"], bon: 1 },
+    { q: "Qu'est-ce qu'un mot de passe solide ?", r: ["Ton prénom", "123456", "Long, avec lettres, chiffres et symboles", "Ta date de naissance"], bon: 2 }
+  ];
+  let qIndex = 0, score = 0;
+
+  function demarrerQuiz() {
+    qIndex = 0; score = 0;
+    document.getElementById("quizFin").hidden = true;
+    afficherQuestion();
+  }
+
+  function afficherQuestion() {
+    const Q = QUESTIONS[qIndex];
+    document.getElementById("quizProgres").textContent = "Question " + (qIndex + 1) + " / " + QUESTIONS.length + " — Score : " + score;
+    document.querySelector("#quizQuestion b").textContent = Q.q;
+    document.getElementById("quizQuestion").hidden = false;
+    document.getElementById("quizSuivant").hidden = true;
+    const zone = document.getElementById("quizReponses");
+    zone.innerHTML = "";
+    Q.r.forEach((texte, i) => {
+      const b = document.createElement("button");
+      b.className = "rep";
+      b.textContent = texte;
+      b.onclick = () => repondre(i);
+      zone.appendChild(b);
+    });
+  }
+
+  function repondre(i) {
+    const Q = QUESTIONS[qIndex];
+    const boutons = document.querySelectorAll("#quizReponses button");
+    boutons.forEach((b, k) => {
+      b.disabled = true;
+      if (k === Q.bon) b.classList.add("bon");
+    });
+    if (i === Q.bon) score++; else boutons[i].classList.add("mauvais");
+    document.getElementById("quizProgres").textContent = "Question " + (qIndex + 1) + " / " + QUESTIONS.length + " — Score : " + score;
+    document.getElementById("quizSuivant").hidden = false;
+    document.getElementById("quizSuivant").textContent = qIndex === QUESTIONS.length - 1 ? "Voir mon score" : "Suivant ➜";
+  }
+
+  function questionSuivante() {
+    qIndex++;
+    if (qIndex < QUESTIONS.length) { afficherQuestion(); return; }
+    document.getElementById("quizQuestion").hidden = true;
+    document.getElementById("quizReponses").innerHTML = "";
+    document.getElementById("quizSuivant").hidden = true;
+    document.getElementById("quizProgres").textContent = "";
+    document.getElementById("quizScore").textContent = "Score : " + score + " / " + QUESTIONS.length;
+    const m = score >= 9 ? "🏆 Excellent, tu es un expert !" :
+              score >= 6 ? "👍 Bien joué, continue comme ça !" :
+              score >= 4 ? "🙂 Pas mal, tu peux encore progresser." :
+                           "📚 Révise un peu et réessaie !";
+    document.getElementById("quizMessage").textContent = m;
+    document.getElementById("quizFin").hidden = false;
+  }
+
+  /* ---------- 3. Générateur de mot de passe ---------- */
+  function genererMdp() {
+    const sets = [];
+    if (document.getElementById("optMin").checked) sets.push("abcdefghijklmnopqrstuvwxyz");
+    if (document.getElementById("optMaj").checked) sets.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    if (document.getElementById("optNum").checked) sets.push("0123456789");
+    if (document.getElementById("optSym").checked) sets.push("!@#$%^&*()-_=+[]{};:,.?");
+    const sortie = document.getElementById("mdpResultat");
+    if (sets.length === 0) { sortie.textContent = "Coche au moins une option"; return; }
+
+    const n = parseInt(document.getElementById("longueur").value, 10);
+    const tous = sets.join("");
+    const alea = max => { const t = new Uint32Array(1); crypto.getRandomValues(t); return t[0] % max; };
+
+    // au moins un caractère de chaque type choisi
+    const chars = sets.map(s => s[alea(s.length)]);
+    while (chars.length < n) chars.push(tous[alea(tous.length)]);
+    // mélange
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = alea(i + 1);
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    const mdp = chars.slice(0, Math.max(n, sets.length)).join("");
+    sortie.textContent = mdp;
+    document.getElementById("msgCopie").textContent = "";
+
+    const f = document.getElementById("force");
+    if (n >= 16 && sets.length >= 3) { f.textContent = "💪 Force : très forte"; f.style.color = "#16a34a"; }
+    else if (n >= 10 && sets.length >= 3) { f.textContent = "👍 Force : forte"; f.style.color = "#65a30d"; }
+    else if (n >= 8 && sets.length >= 2) { f.textContent = "🙂 Force : moyenne"; f.style.color = "#d97706"; }
+    else { f.textContent = "⚠️ Force : faible"; f.style.color = "#dc2626"; }
+  }
+
+  async function copierMdp() {
+    const texte = document.getElementById("mdpResultat").textContent;
+    const msg = document.getElementById("msgCopie");
+    if (!texte || texte.startsWith("Clique") || texte.startsWith("Coche")) { msg.textContent = "Génère d'abord un mot de passe."; return; }
+    try { await navigator.clipboard.writeText(texte); msg.textContent = "✅ Copié !"; }
+    catch (e) { msg.textContent = "Copie impossible : sélectionne le texte et copie-le à la main."; }
+  }
+
+  /* ---------- 4. Convertisseur ---------- */
+  const FCFA_PAR_EUR = 655.957;
+  function convertir() {
+    const montant = parseFloat(document.getElementById("montant").value);
+    const de = document.getElementById("de").value;
+    const vers = document.getElementById("vers").value;
+    const usdParEur = parseFloat(document.getElementById("tauxUsd").value);
+    const sortie = document.getElementById("convResultat");
+    if (isNaN(montant) || isNaN(usdParEur) || usdParEur <= 0) { sortie.textContent = ""; return; }
+
+    const fcfaPar = { FCFA: 1, EUR: FCFA_PAR_EUR, USD: FCFA_PAR_EUR / usdParEur };
+    const res = montant * fcfaPar[de] / fcfaPar[vers];
+    const fmt = n => n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+    sortie.textContent = fmt(montant) + " " + de + " = " + fmt(res) + " " + vers;
+  }
+
+  function inverser() {
+    const de = document.getElementById("de"), vers = document.getElementById("vers");
+    const t = de.value; de.value = vers.value; vers.value = t;
+    convertir();
+  }
+
+  // Essaie de récupérer le taux Euro/Dollar en direct
+  fetch("https://open.er-api.com/v6/latest/EUR")
+    .then(r => r.json())
+    .then(d => {
+      if (d && d.rates && d.rates.USD) {
+        document.getElementById("tauxUsd").value = d.rates.USD.toFixed(4);
+        document.getElementById("tauxMsg").textContent = "✅ Taux Euro/Dollar récupéré en direct sur Internet.";
+        convertir();
+      }
+    })
+    .catch(() => {
+      document.getElementById("tauxMsg").textContent = "ℹ️ Taux Euro/Dollar approximatif : modifie-le à la main si besoin.";
+    });
+
+  /* ---------- Démarrage ---------- */
+  majEcran();
+  demarrerQuiz();
+  convertir();
+</script>
+</body>
+</html>
